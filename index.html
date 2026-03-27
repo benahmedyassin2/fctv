@@ -4,181 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>KORA LIVE | كورة لايف</title>
+    <title>KORA LIVE | برو بلاير</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
 
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --main-red: #e11d48;
-            --card-color: #1e293b;
-            --text-white: #f8fafc;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-white);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        header {
-            background-color: var(--main-red);
-            padding: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-
-        /* حاوية المشغل - مخفية في البداية */
-        #player-wrapper {
-            display: none;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            border: 2px solid var(--main-red);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        video, iframe {
-            width: 100%;
-            aspect-ratio: 16/9;
-            display: block;
-            border: none;
-        }
-
-        .close-btn {
-            background: #334155;
-            color: white;
-            border: none;
-            padding: 12px;
-            width: 100%;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .close-btn:hover { background: #475569; }
-
-        .match-card {
-            background-color: var(--card-color);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-            border: 1px solid #334155;
-        }
-
-        .match-card:hover {
-            border-color: var(--main-red);
-            transform: translateY(-3px);
-        }
-
-        .status {
-            background: var(--main-red);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        footer {
-            text-align: center;
-            padding: 30px;
-            font-size: 14px;
-            color: #94a3b8;
-        }
+        :root { --bg: #0f172a; --red: #e11d48; --card: #1e293b; }
+        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; text-align: center; }
+        header { background: var(--red); padding: 20px; font-size: 22px; font-weight: bold; }
+        .container { max-width: 700px; margin: 20px auto; padding: 0 15px; }
+        
+        #player-wrapper { display: none; margin-bottom: 20px; border: 2px solid var(--red); border-radius: 10px; overflow: hidden; background: #000; }
+        .video-js { width: 100%; aspect-ratio: 16/9; }
+        
+        .match-card { background: var(--card); padding: 20px; margin: 10px 0; border-radius: 12px; cursor: pointer; border: 1px solid #334155; }
+        .match-card:hover { border-color: var(--red); }
+        .btn-close { background: #334155; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<header>KORA LIVE - بث مباشر</header>
+<header>KORA LIVE - PRO PLAYER</header>
 
 <div class="container">
-    
     <div id="player-wrapper">
-        <button class="close-btn" onclick="stopPlayer()">إغلاق المشغل ✕</button>
-        <div id="video-container">
-            </div>
+        <button class="btn-close" onclick="stopPlayer()">إغلاق المشغل ✕</button>
+        <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="264">
+            <p class="vjs-no-js">يرجى تفعيل الجافا سكريبت</p>
+        </video>
     </div>
 
-    <h2 style="margin-bottom: 20px;">مباريات اليوم:</h2>
+    <h2>قنوات البث المتاحة:</h2>
 
-    <div class="match-card" onclick="playMedia('https://www.youtube.com/embed/wKGgqN2csNY', 'youtube')">
-        <span>بث يوتيوب (تجريبي)</span>
-        <span class="status">مباشر</span>
+    <div class="match-card" onclick="playStream('https://www.bloomberg.com/media-manifest/streams/eu-event.m3u8')">
+        تجربة المشغل (Bloomberg) - اضغط هنا أولاً
     </div>
 
-    <div class="match-card" onclick="playMedia('https://www.bloomberg.com/media-manifest/streams/eu-event.m3u8', 'hls')">
-        <span>قناة Bloomberg (HLS)</span>
-        <span class="status">مباشر</span>
+    <div class="match-card" onclick="playStream('http://classe.iptv.newtvhd.com:8080/1901271330/5y29HpRSE60e8GD/237015')">
+        قناة IPTV الخاصة بك (قيد التجربة)
     </div>
-
-    <div class="match-card" onclick="playMedia('http://classe.iptv.newtvhd.com:8080/1901271330/5y29HpRSE60e8GD/237015', 'hls')">
-        <span>قناة IPTV الخاصة بك</span>
-        <span class="status">مباشر</span>
-    </div>
-
 </div>
 
-<footer>جميع الحقوق محفوظة © 2026</footer>
-
 <script>
-    var hls;
+    var player = videojs('my-video');
 
-    function playMedia(url, type) {
-        var wrapper = document.getElementById('player-wrapper');
-        var container = document.getElementById('video-container');
-        
-        // إظهار المشغل وتنظيف المحتوى القديم
-        wrapper.style.display = 'block';
-        if (hls) { hls.destroy(); }
-        container.innerHTML = '';
-
-        if (type === 'youtube') {
-            // تشغيل يوتيوب عبر Iframe
-            container.innerHTML = '<iframe src="' + url + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-        } 
-        else if (type === 'hls') {
-            // تشغيل روابط m3u8 / IPTV
-            var videoElem = document.createElement('video');
-            videoElem.controls = true;
-            videoElem.autoplay = true;
-            container.appendChild(videoElem);
-
-            if (Hls.isSupported()) {
-                hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(videoElem);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    videoElem.play();
-                });
-            } else if (videoElem.canPlayType('application/vnd.apple.mpegurl')) {
-                videoElem.src = url;
-                videoElem.play();
-            }
-        }
-
+    function playStream(url) {
+        document.getElementById('player-wrapper').style.display = 'block';
+        player.src({
+            src: url,
+            type: 'application/x-mpegURL'
+        });
+        player.play();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function stopPlayer() {
-        if (hls) { hls.destroy(); }
-        document.getElementById('video-container').innerHTML = '';
+        player.pause();
         document.getElementById('player-wrapper').style.display = 'none';
     }
 </script>
