@@ -3,54 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KORA LIVE | الحل النهائي</title>
-    <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+    <title>KORA LIVE | البث المباشر</title>
+    
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+
     <style>
-        :root { --bg: #0f172a; --red: #e11d48; }
-        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; margin: 0; }
-        header { background: var(--red); padding: 15px; font-weight: bold; }
-        .container { max-width: 800px; margin: 20px auto; padding: 10px; }
-        #player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-        .match-card { background: #1e293b; padding: 20px; border-radius: 12px; cursor: pointer; border: 1px solid #334155; margin-bottom: 10px; }
+        :root { --bg: #0f172a; --red: #e11d48; --card: #1e293b; --white: #f8fafc; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 0; }
+        header { background: var(--red); padding: 20px; text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        
+        #player-wrapper { display: none; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 2px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-js { width: 100%; aspect-ratio: 16/9; }
+        .btn-close { background: #334155; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; }
+
+        .match-card { background: var(--card); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 18px; margin-bottom: 12px; cursor: pointer; border: 1px solid #334155; transition: 0.3s; }
+        .match-card:hover { border-color: var(--red); transform: translateY(-3px); }
+        .status { background: var(--red); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; animation: blink 1.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        
+        .channel-name { font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
 
-<header>KORA LIVE - IPTV FIX</header>
+<header>KORA LIVE - تفرج وماركس</header>
 
 <div class="container">
-    <div id="player"></div>
-
-    <div class="match-card" onclick="forcePlay('http://classe.iptv.newtvhd.com:8080/1901271330/5y29HpRSE60e8GD/237015')">
-        شغل قناة الـ IPTV (محاولة التخطي)
+    
+    <div id="player-wrapper">
+        <button class="btn-close" onclick="stopPlayer()">إغلاق المشغل ✕</button>
+        <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto">
+            <p class="vjs-no-js">شغل الجافا سكريبت يا معلم</p>
+        </video>
     </div>
+
+    <h2 style="margin-bottom: 20px; border-right: 4px solid var(--red); padding-right: 10px;">القنوات الشغالة الآن:</h2>
+
+    <div class="match-card" onclick="playChannel('https://v7.itworkscdn.net/elwataniatv/live/playlist.m3u8')">
+        <span class="channel-name">🇹🇳 الوطنية الأولى</span>
+        <span class="status">مباشر الآن</span>
+    </div>
+
+    <div class="match-card" onclick="playChannel('https://v7.itworkscdn.net/elwataniatv2/live/playlist.m3u8')">
+        <span class="channel-name">🇹🇳 الوطنية الثانية</span>
+        <span class="status">مباشر الآن</span>
+    </div>
+
+    <div class="match-card" onclick="playChannel('https://static.france24.com/live/f24_ar.video/playlist.m3u8')">
+        <span class="channel-name">🌍 France 24 (الأخبار)</span>
+        <span class="status">مباشر الآن</span>
+    </div>
+
+    <div class="match-card" onclick="playChannel('https://www.bloomberg.com/media-manifest/streams/eu-event.m3u8')">
+        <span class="channel-name">📊 Bloomberg TV</span>
+        <span class="status">مباشر الآن</span>
+    </div>
+
 </div>
 
-<script>
-    var player;
-
-    function forcePlay(url) {
-        // نستعملوا بروكسي باش يفك الـ CORS والـ HTTP
-        var proxy = "https://cors-anywhere.herokuapp.com/";
-        var finalUrl = url; // جرب بلاش بروكسي الساعة، كان ما مشاش نزيدوه
-
-        if (player) { player.destroy(); }
-
-        player = new Clappr.Player({
-            source: finalUrl,
-            parentId: "#player",
-            width: '100%',
-            height: '100%',
-            autoPlay: true,
-            hlsjsConfig: {
-                enableWorker: true,
-                // هذي أهم حاجة باش يقبل الروابط اللي فيها مشاكل
-                xhrSetup: function(xhr, url) {
-                    xhr.withCredentials = false;
-                }
-            }
-        });
-    }
-</script>
-</body>
-</html>
+<footer>جميع الحقوق محفوظة لـ كورة لايف © 202
