@@ -3,98 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>KORA LIVE | البث المباشر</title>
+    <title>KORA LIVE | النسخة الصاروخية</title>
     
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
-        :root { --bg: #0f172a; --red: #e11d48; --card: #1e293b; --white: #f8fafc; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--white); margin: 0; padding: 0; }
-        header { background: var(--red); padding: 20px; text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        body { background: #0f172a; color: white; font-family: sans-serif; margin: 0; text-align: center; }
+        header { background: #e11d48; padding: 20px; font-size: 24px; font-weight: bold; }
         .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-        
-        /* حاوية المشغل */
-        #player-wrapper { display: none; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 2px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-        .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; }
-        .btn-close { background: #334155; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-close:hover { background: #475569; }
-
-        .match-card { background: var(--card); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 20px; margin-bottom: 12px; cursor: pointer; border: 1px solid #334155; transition: 0.3s; }
-        .match-card:hover { border-color: var(--red); transform: translateY(-3px); }
-        .status { background: var(--red); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; animation: blink 1.5s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-        
-        .channel-info { display: flex; align-items: center; gap: 15px; }
-        .dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; }
+        #player-container { display: none; margin-bottom: 20px; border: 2px solid #e11d48; border-radius: 12px; overflow: hidden; background: #000; }
+        .match-card { background: #1e293b; padding: 20px; margin: 10px 0; border-radius: 12px; cursor: pointer; border: 1px solid #334155; transition: 0.3s; }
+        .match-card:hover { border-color: #e11d48; }
+        .btn-close { background: #334155; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<header>KORA LIVE - تفرج مريغل</header>
+<header>KORA LIVE - النسخة النهائية</header>
 
 <div class="container">
-    
-    <div id="player-wrapper">
-        <button class="btn-close" onclick="stopPlayer()">إغلاق المشغل ✕</button>
-        <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto">
-            <p class="vjs-no-js">يرجى تفعيل الجافا سكريبت</p>
-        </video>
+    <div id="player-container">
+        <button class="btn-close" onclick="stopPlayer()">إغلاق ✕</button>
+        <video id="player" playsinline controls></video>
     </div>
 
-    <h2 style="margin-bottom: 20px;">القنوات الشغالة الآن:</h2>
+    <h2>اختر القناة:</h2>
 
-    <div class="match-card" onclick="playChannel('https://v7.itworkscdn.net/elwataniatv/live/playlist.m3u8')">
-        <div class="channel-info">
-            <div class="dot"></div>
-            <span style="font-weight:bold;">🇹🇳 الوطنية الأولى (رسمي)</span>
-        </div>
-        <span class="status">مباشر الآن</span>
+    <div class="match-card" onclick="loadStream('https://v7.itworkscdn.net/elwataniatv/live/playlist.m3u8')">
+        🇹🇳 الوطنية الأولى (HLS)
     </div>
 
-    <div class="match-card" onclick="playChannel('https://static.france24.com/live/f24_ar.video/playlist.m3u8')">
-        <div class="channel-info">
-            <div class="dot"></div>
-            <span style="font-weight:bold;">🌍 France 24 (الأخبار)</span>
-        </div>
-        <span class="status">مباشر الآن</span>
+    <div class="match-card" onclick="loadStream('https://static.france24.com/live/f24_ar.video/playlist.m3u8')">
+        🌍 France 24 (HLS)
     </div>
-
 </div>
 
-<footer>جميع الحقوق محفوظة © 2026</footer>
-
 <script>
-    // إنشاء المشغل مرة واحدة عند تحميل الصفحة
-    var player = videojs('my-video', {
-        fluid: true,
-        responsive: true
-    });
+    const video = document.getElementById('player');
+    const player = new Plyr(video);
 
-    function playChannel(url) {
-        // إظهار المشغل
-        document.getElementById('player-wrapper').style.display = 'block';
+    function loadStream(url) {
+        document.getElementById('player-container').style.display = 'block';
         
-        // تبديل السورس وتشغيل البث مباشرة
-        player.src({
-            src: url,
-            type: 'application/x-mpegURL'
-        });
-
-        player.ready(function() {
-            player.play();
-        });
-
-        // سكرول آلي للفوق باش تشوف الفيديو
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play();
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = url;
+            video.play();
+        }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function stopPlayer() {
-        player.pause();
-        document.getElementById('player-wrapper').style.display = 'none';
+        video.pause();
+        document.getElementById('player-container').style.display = 'none';
     }
 </script>
-
 </body>
 </html>
