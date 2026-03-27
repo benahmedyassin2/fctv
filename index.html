@@ -3,67 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>KORA LIVE | برو بلاير</title>
-    
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-
+    <title>KORA LIVE | الحل النهائي</title>
+    <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
     <style>
-        :root { --bg: #0f172a; --red: #e11d48; --card: #1e293b; }
-        body { font-family: sans-serif; background: var(--bg); color: white; margin: 0; text-align: center; }
-        header { background: var(--red); padding: 20px; font-size: 22px; font-weight: bold; }
-        .container { max-width: 700px; margin: 20px auto; padding: 0 15px; }
-        
-        #player-wrapper { display: none; margin-bottom: 20px; border: 2px solid var(--red); border-radius: 10px; overflow: hidden; background: #000; }
-        .video-js { width: 100%; aspect-ratio: 16/9; }
-        
-        .match-card { background: var(--card); padding: 20px; margin: 10px 0; border-radius: 12px; cursor: pointer; border: 1px solid #334155; }
-        .match-card:hover { border-color: var(--red); }
-        .btn-close { background: #334155; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; }
+        :root { --bg: #0f172a; --red: #e11d48; }
+        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; margin: 0; }
+        header { background: var(--red); padding: 15px; font-weight: bold; }
+        .container { max-width: 800px; margin: 20px auto; padding: 10px; }
+        #player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+        .match-card { background: #1e293b; padding: 20px; border-radius: 12px; cursor: pointer; border: 1px solid #334155; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<header>KORA LIVE - PRO PLAYER</header>
+<header>KORA LIVE - IPTV FIX</header>
 
 <div class="container">
-    <div id="player-wrapper">
-        <button class="btn-close" onclick="stopPlayer()">إغلاق المشغل ✕</button>
-        <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="264">
-            <p class="vjs-no-js">يرجى تفعيل الجافا سكريبت</p>
-        </video>
-    </div>
+    <div id="player"></div>
 
-    <h2>قنوات البث المتاحة:</h2>
-
-    <div class="match-card" onclick="playStream('https://www.bloomberg.com/media-manifest/streams/eu-event.m3u8')">
-        تجربة المشغل (Bloomberg) - اضغط هنا أولاً
-    </div>
-
-    <div class="match-card" onclick="playStream('http://classe.iptv.newtvhd.com:8080/1901271330/5y29HpRSE60e8GD/237015')">
-        قناة IPTV الخاصة بك (قيد التجربة)
+    <div class="match-card" onclick="forcePlay('http://classe.iptv.newtvhd.com:8080/1901271330/5y29HpRSE60e8GD/237015')">
+        شغل قناة الـ IPTV (محاولة التخطي)
     </div>
 </div>
 
 <script>
-    var player = videojs('my-video');
+    var player;
 
-    function playStream(url) {
-        document.getElementById('player-wrapper').style.display = 'block';
-        player.src({
-            src: url,
-            type: 'application/x-mpegURL'
+    function forcePlay(url) {
+        // نستعملوا بروكسي باش يفك الـ CORS والـ HTTP
+        var proxy = "https://cors-anywhere.herokuapp.com/";
+        var finalUrl = url; // جرب بلاش بروكسي الساعة، كان ما مشاش نزيدوه
+
+        if (player) { player.destroy(); }
+
+        player = new Clappr.Player({
+            source: finalUrl,
+            parentId: "#player",
+            width: '100%',
+            height: '100%',
+            autoPlay: true,
+            hlsjsConfig: {
+                enableWorker: true,
+                // هذي أهم حاجة باش يقبل الروابط اللي فيها مشاكل
+                xhrSetup: function(xhr, url) {
+                    xhr.withCredentials = false;
+                }
+            }
         });
-        player.play();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function stopPlayer() {
-        player.pause();
-        document.getElementById('player-wrapper').style.display = 'none';
     }
 </script>
-
 </body>
 </html>
