@@ -4,69 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>KORA LIVE | بث مباشر</title>
+    <title>KORA LIVE | كورة لايف</title>
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    
-    <style>
-        :root { --bg-color: #0f172a; --main-red: #e11d48; --card-color: #1e293b; --text-white: #f8fafc; }
-        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-white); margin: 0; padding: 0; }
-        header { background: var(--main-red); padding: 20px; text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-        
-        #player-wrapper { display: none; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 2px solid var(--main-red); }
-        video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
-        .close-btn { background: #334155; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; }
 
-        .match-card { background: var(--card-color); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 20px; margin-bottom: 15px; cursor: pointer; border: 1px solid #334155; transition: 0.3s; }
-        .match-card:hover { border-color: var(--main-red); }
-        .status { background: var(--main-red); padding: 5px 15px; border-radius: 20px; font-size: 14px; }
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --main-red: #e11d48;
+            --card-color: #1e293b;
+            --text-white: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--main-red);
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* حاوية المشغل - مخفية في البداية */
+        #player-wrapper {
+            display: none;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            border: 2px solid var(--main-red);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        video, iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            display: block;
+            border: none;
+        }
+
+        .close-btn {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close-btn:hover { background: #475569; }
+
+        .match-card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid #334155;
+        }
+
+        .match-card:hover {
+            border-color: var(--main-red);
+            transform: translateY(-3px);
+        }
+
+        .status {
+            background: var(--main-red);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body>
 
-<header>KORA LIVE - البث المباشر</header>
+<header>KORA LIVE - بث مباشر</header>
 
 <div class="container">
+    
     <div id="player-wrapper">
         <button class="close-btn" onclick="stopPlayer()">إغلاق المشغل ✕</button>
-        <video id="video" controls autoplay></video>
+        <div id="video-container">
+            </div>
     </div>
 
     <h2 style="margin-bottom: 20px;">مباريات اليوم:</h2>
-    
-    <div class="match-card" onclick="playM3U8('http://classe.iptv.newtvhd.com:8080/1901271330/5y29HpRSE60e8GD/237015')">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:10px; height:10px; background:#22c55e; border-radius:50%;"></div>
-            <span>قناة البث (IPTV)</span>
-        </div>
-        <span class="status">مباشر الآن</span>
+
+    <div class="match-card" onclick="playMedia('https://www.youtube.com/embed/wKGgqN2csNY', 'youtube')">
+        <span>بث يوتيوب (تجريبي)</span>
+        <span class="status">مباشر</span>
     </div>
+
+    <div class="match-card" onclick="playMedia('https://www.bloomberg.com/media-manifest/streams/eu-event.m3u8', 'hls')">
+        <span>قناة Bloomberg (HLS)</span>
+        <span class="status">مباشر</span>
+    </div>
+
+    <div class="match-card" onclick="playMedia('http://classe.iptv.newtvhd.com:8080/1901271330/5y29HpRSE60e8GD/237015', 'hls')">
+        <span>قناة IPTV الخاصة بك</span>
+        <span class="status">مباشر</span>
+    </div>
+
 </div>
 
+<footer>جميع الحقوق محفوظة © 2026</footer>
+
 <script>
-    var video = document.getElementById('video');
     var hls;
 
-    function playM3U8(url) {
-        document.getElementById('player-wrapper').style.display = 'block';
+    function playMedia(url, type) {
+        var wrapper = document.getElementById('player-wrapper');
+        var container = document.getElementById('video-container');
         
-        if (Hls.isSupported()) {
-            if (hls) { hls.destroy(); }
-            hls = new Hls();
-            hls.loadSource(url);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
-            });
-            // إذا السيرفر فيه مشكلة CORS باش يطلعلك Error هنا في الـ Console
-            hls.on(Hls.Events.ERROR, function (event, data) {
-                console.log("HLS Error:", data);
-            });
+        // إظهار المشغل وتنظيف المحتوى القديم
+        wrapper.style.display = 'block';
+        if (hls) { hls.destroy(); }
+        container.innerHTML = '';
+
+        if (type === 'youtube') {
+            // تشغيل يوتيوب عبر Iframe
+            container.innerHTML = '<iframe src="' + url + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
         } 
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = url;
-            video.play();
+        else if (type === 'hls') {
+            // تشغيل روابط m3u8 / IPTV
+            var videoElem = document.createElement('video');
+            videoElem.controls = true;
+            videoElem.autoplay = true;
+            container.appendChild(videoElem);
+
+            if (Hls.isSupported()) {
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(videoElem);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoElem.play();
+                });
+            } else if (videoElem.canPlayType('application/vnd.apple.mpegurl')) {
+                videoElem.src = url;
+                videoElem.play();
+            }
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -74,8 +178,7 @@
 
     function stopPlayer() {
         if (hls) { hls.destroy(); }
-        video.pause();
-        video.src = "";
+        document.getElementById('video-container').innerHTML = '';
         document.getElementById('player-wrapper').style.display = 'none';
     }
 </script>
