@@ -39,7 +39,6 @@
             padding: 0 15px;
         }
 
-        /* منطقة مشغل الفيديو */
         #player-wrapper {
             display: none;
             background: #000;
@@ -62,11 +61,8 @@
             width: 100%;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
         }
-        .close-btn:hover { background: #475569; }
 
-        /* تصميم جدول المباريات */
         .match-card {
             background-color: var(--card-color);
             border-radius: 12px;
@@ -80,28 +76,10 @@
             border: 1px solid #334155;
         }
 
-        .match-card:hover {
-            transform: scale(1.01);
-            border-color: var(--main-red);
-        }
+        .match-card:hover { border-color: var(--main-red); }
 
-        .team {
-            flex: 1;
-            text-align: center;
-        }
-
-        .team img {
-            width: 60px;
-            height: 60px;
-            display: block;
-            margin: 0 auto 10px;
-            object-fit: contain;
-        }
-
-        .match-info {
-            flex: 1;
-            text-align: center;
-        }
+        .team { flex: 1; text-align: center; }
+        .team img { width: 60px; height: 60px; display: block; margin: 0 auto 10px; }
 
         .status {
             background: var(--main-red);
@@ -112,23 +90,15 @@
         }
 
         .live-dot {
-            height: 10px;
-            width: 10px;
+            height: 10px; width: 10px;
             background-color: #22c55e;
             border-radius: 50%;
             display: inline-block;
-            margin-left: 5px;
             animation: blink 1s infinite;
         }
-
         @keyframes blink { 50% { opacity: 0; } }
 
-        footer {
-            text-align: center;
-            padding: 30px;
-            font-size: 14px;
-            color: #94a3b8;
-        }
+        footer { text-align: center; padding: 30px; font-size: 14px; color: #94a3b8; }
     </style>
 </head>
 <body>
@@ -142,53 +112,33 @@
         <div id="player"></div>
     </div>
 
-    <h2 style="margin-bottom: 20px; border-right: 4px solid var(--main-red); padding-right: 10px;">مباريات اليوم:</h2>
+    <h2 style="margin-bottom: 20px;">مباريات اليوم:</h2>
 
-    <div class="match-card" onclick="playMatch('بث مباشر - Bloomberg TV', 'https://www.bloomberg.com/media-manifest/streams/eu.m3u8')">
+    <div class="match-card" onclick="playMatch('بث مباشر', 'https://youtu.be/wKGgqN2csNY')">
         <div class="team">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Bloomberg_Logo.svg" alt="Bloomberg">
-            <span>Bloomberg TV</span>
+            <img src="https://via.placeholder.com/60/e11d48/ffffff?text=LIVE" alt="Live">
+            <span>قناة البث</span>
         </div>
-        <div class="match-info">
+        <div class="match-info" style="text-align: center;">
             <span class="status"><span class="live-dot"></span> مباشر الآن</span>
-            <p style="margin-top: 10px; color: #94a3b8;">بث عالمي مباشر</p>
         </div>
         <div class="team">
-            <img src="https://via.placeholder.com/60/1e293b/f8fafc?text=LIVE" alt="Live">
-            <span>World News</span>
-        </div>
-    </div>
-
-    <div class="match-card" onclick="playMatch('مباراة تجريبية - يوتيوب', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')">
-        <div class="team">
-            <img src="https://via.placeholder.com/60/1e293b/f8fafc?text=TEAM+A" alt="Team A">
-            <span>فريق أ</span>
-        </div>
-        <div class="match-info">
-            <span style="color: #94a3b8; font-weight: bold;">21:00</span>
-            <p style="margin-top: 10px; font-size: 12px;">الدوري الإسباني</p>
-        </div>
-        <div class="team">
-            <img src="https://via.placeholder.com/60/1e293b/f8fafc?text=TEAM+B" alt="Team B">
-            <span>فريق ب</span>
+            <img src="https://via.placeholder.com/60/1e293b/ffffff?text=KORA" alt="Kora">
+            <span>مباراة قوية</span>
         </div>
     </div>
 
 </div>
 
-<footer>جميع الحقوق محفوظة © 2026 | كورة لايف</footer>
+<footer>جميع الحقوق محفوظة © 2026</footer>
 
 <script>
     var mainPlayer;
 
     function playMatch(title, url) {
-        // إظهار منطقة المشغل
         document.getElementById('player-wrapper').style.display = 'block';
-        
-        // إذا كان المشغل موجوداً، نقوم بتدميره لإنشاء واحد جديد
         if (mainPlayer) { mainPlayer.destroy(); }
 
-        // إنشاء مشغل جديد باستخدام Clappr
         mainPlayer = new Clappr.Player({
             source: url,
             parentId: "#player",
@@ -196,12 +146,9 @@
             width: '100%',
             height: '100%',
             autoPlay: true,
-            // معالجة تلقائية للأنواع المختلفة من الروابط
-            mimeType: url.includes('.ts') ? 'video/mp2t' : (url.includes('.m3u8') ? 'application/x-mpegURL' : null),
             mediacontrol: {seekbar: "#e11d48", buttons: "#fff"},
         });
 
-        // التمرير التلقائي لأعلى الصفحة لمشاهدة الفيديو
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
