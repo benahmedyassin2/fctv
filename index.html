@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>KORA LIVE | بث مباشر</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    
     <style>
         :root { --bg-color: #0f172a; --main-red: #e11d48; --card-color: #1e293b; --text-white: #f8fafc; }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-white); margin: 0; padding: 0; }
@@ -16,9 +19,8 @@
         .close-btn { background: #334155; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; }
 
         .match-card { background: var(--card-color); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 20px; margin-bottom: 15px; cursor: pointer; border: 1px solid #334155; transition: 0.3s; }
-        .match-card:hover { border-color: var(--main-red); transform: translateY(-2px); }
-        .status { background: var(--main-red); padding: 5px 15px; border-radius: 20px; font-size: 14px; animation: blink 1.5s infinite; }
-        @keyframes blink { 50% { opacity: 0.6; } }
+        .match-card:hover { border-color: var(--main-red); }
+        .status { background: var(--main-red); padding: 5px 15px; border-radius: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -36,7 +38,7 @@
     <div class="match-card" onclick="playM3U8('http://classe.iptv.newtvhd.com:8080/1901271330/5y29HpRSE60e8GD/237015')">
         <div style="display:flex; align-items:center; gap:10px;">
             <div style="width:10px; height:10px; background:#22c55e; border-radius:50%;"></div>
-            <span>Bloomberg TV (M3U8)</span>
+            <span>قناة البث (IPTV)</span>
         </div>
         <span class="status">مباشر الآن</span>
     </div>
@@ -44,30 +46,34 @@
 
 <script>
     var video = document.getElementById('video');
+    var hls;
 
     function playM3U8(url) {
         document.getElementById('player-wrapper').style.display = 'block';
         
         if (Hls.isSupported()) {
-            var hls = new Hls();
+            if (hls) { hls.destroy(); }
+            hls = new Hls();
             hls.loadSource(url);
             hls.attachMedia(video);
             hls.on(Hls.Events.MANIFEST_PARSED, function() {
                 video.play();
             });
+            // إذا السيرفر فيه مشكلة CORS باش يطلعلك Error هنا في الـ Console
+            hls.on(Hls.Events.ERROR, function (event, data) {
+                console.log("HLS Error:", data);
+            });
         } 
-        // للدعم على متصفحات Safari و iPhone
         else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             video.src = url;
-            video.addEventListener('loadedmetadata', function() {
-                video.play();
-            });
+            video.play();
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function stopPlayer() {
+        if (hls) { hls.destroy(); }
         video.pause();
         video.src = "";
         document.getElementById('player-wrapper').style.display = 'none';
