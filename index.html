@@ -3,53 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KORA LIVE | كورة لايف</title>
+    <title>KORA LIVE | بث مباشر</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root { --bg-color: #0f172a; --main-red: #e11d48; --card-color: #1e293b; --text-white: #f8fafc; }
         body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-white); margin: 0; padding: 0; }
-        header { background: var(--main-red); padding: 20px; text-align: center; font-size: 24px; font-weight: bold; }
+        header { background: var(--main-red); padding: 20px; text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
         
-        /* المشغل مخفي في الأول باش ما يعملش Loading */
         #player-wrapper { display: none; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 2px solid var(--main-red); }
-        .close-btn { background: #334155; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; }
+        video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
+        .close-btn { background: #334155; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; }
 
-        .match-card { background: var(--card-color); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 20px; margin-bottom: 15px; cursor: pointer; border: 1px solid #334155; }
-        .match-card:hover { border-color: var(--main-red); }
-        .status { background: var(--main-red); padding: 5px 15px; border-radius: 20px; font-size: 14px; }
+        .match-card { background: var(--card-color); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 20px; margin-bottom: 15px; cursor: pointer; border: 1px solid #334155; transition: 0.3s; }
+        .match-card:hover { border-color: var(--main-red); transform: translateY(-2px); }
+        .status { background: var(--main-red); padding: 5px 15px; border-radius: 20px; font-size: 14px; animation: blink 1.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.6; } }
     </style>
 </head>
 <body>
 
-<header>KORA LIVE - بث مباشر</header>
+<header>KORA LIVE - البث المباشر</header>
 
 <div class="container">
     <div id="player-wrapper">
         <button class="close-btn" onclick="stopPlayer()">إغلاق المشغل ✕</button>
-        <div id="player-container"></div>
+        <video id="video" controls autoplay></video>
     </div>
 
-    <h2>مباريات اليوم:</h2>
-    <div class="match-card" onclick="playMatch('https://www.youtube.com/embed/wKGgqN2csNY')">
-        <span>فريق 1</span>
+    <h2 style="margin-bottom: 20px;">مباريات اليوم:</h2>
+    
+    <div class="match-card" onclick="playM3U8('https://www.bloomberg.com/media-manifest/streams/eu-event.m3u8')">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:10px; height:10px; background:#22c55e; border-radius:50%;"></div>
+            <span>Bloomberg TV (M3U8)</span>
+        </div>
         <span class="status">مباشر الآن</span>
-        <span>فريق 2</span>
     </div>
 </div>
 
 <script>
-    function playMatch(url) {
+    var video = document.getElementById('video');
+
+    function playM3U8(url) {
         document.getElementById('player-wrapper').style.display = 'block';
-        // نحطو الـ Iframe كان كي ننزلوا على الماتش
-        document.getElementById('player-container').innerHTML = 
-            '<iframe width="100%" height="450" src="' + url + '?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="aspect-ratio: 16/9;"></iframe>';
+        
+        if (Hls.isSupported()) {
+            var hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play();
+            });
+        } 
+        // للدعم على متصفحات Safari و iPhone
+        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = url;
+            video.addEventListener('loadedmetadata', function() {
+                video.play();
+            });
+        }
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function stopPlayer() {
-        document.getElementById('player-container').innerHTML = '';
+        video.pause();
+        video.src = "";
         document.getElementById('player-wrapper').style.display = 'none';
     }
 </script>
+
 </body>
 </html>
